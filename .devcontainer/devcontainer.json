@@ -1,15 +1,14 @@
 {
-  "name": "Android Development",
-  "features": {
-    "ghcr.io/devcontainers/features/java:1": {
-      "version": "17"
-    },
-    "ghcr.io/devcontainers/features/android-sdk:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/gradle:1": {
-      "version": "latest"
-    }
+  "name": "Android Builder",
+  "build": {
+    "dockerfile": "Dockerfile"
   },
-  "postCreateCommand": "./gradlew tasks"
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "extensions": [
+    "vscjava.vscode-java-pack",
+    "android-devtools.android-devtools"
+  ],
+  "postCreateCommand": "./gradlew tasks || true"
 }
