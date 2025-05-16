@@ -1,5 +1,5 @@
 {
-  "name": "Android Builder",
+  "name": "Android 12 Builder",
   "build": {
     "dockerfile": "Dockerfile"
   },
@@ -10,5 +10,5 @@
     "vscjava.vscode-java-pack",
     "android-devtools.android-devtools"
   ],
-  "postCreateCommand": "./gradlew tasks || true"
+  "postCreateCommand": "chmod +x ./gradlew && ./gradlew tasks || true"
 }
