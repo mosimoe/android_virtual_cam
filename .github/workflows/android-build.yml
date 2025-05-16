@@ -1,0 +1,56 @@
+name: Build Android APK (Android 12)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      JAVA_VERSION: 17
+      ANDROID_SDK_ROOT: /opt/android-sdk
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK ${{ env.JAVA_VERSION }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ env.JAVA_VERSION }}
+
+    - name: Download Android SDK cmdline-tools
+      run: |
+        mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+        curl -o sdk-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+        unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools/latest
+        rm sdk-tools.zip
+        echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
+    - name: Add SDK tools to path
+      run: |
+        echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
+
+    - name: Install Android SDK packages
+      run: |
+        yes | sdkmanager --licenses
+        sdkmanager "platform-tools" "platforms;android-31" "build-tools;31.0.0"
+
+    - name: Make Gradle wrapper executable
+      run: chmod +x ./gradlew
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug
+
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug.apk
+        path: app/build/outputs/apk/debug/app-debug.apk
